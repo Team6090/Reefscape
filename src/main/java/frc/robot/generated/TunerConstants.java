@@ -72,7 +72,7 @@ public class TunerConstants {
                   .withStatorCurrentLimitEnable(true));
   private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
   // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
-  private static final Pigeon2Configuration pigeonConfigs = null;
+  //   private static final Pigeon2Configuration pigeonConfigs = null;
 
   // CAN bus that the devices are located on;
   // All swerve devices must share the same CAN bus
@@ -93,7 +93,7 @@ public class TunerConstants {
   private static final boolean kInvertLeftSide = false;
   private static final boolean kInvertRightSide = true;
 
-  private static final int kPigeonId = 15;
+  //   private static final int kPigeonId = 15;
 
   // These are only used for simulation
   private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.004);
@@ -102,11 +102,11 @@ public class TunerConstants {
   private static final Voltage kSteerFrictionVoltage = Volts.of(0.2);
   private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
 
-  public static final SwerveDrivetrainConstants DrivetrainConstants =
-      new SwerveDrivetrainConstants()
-          .withCANBusName(kCANBus.getName())
-          .withPigeon2Id(kPigeonId)
-          .withPigeon2Configs(pigeonConfigs);
+  //   public static final SwerveDrivetrainConstants DrivetrainConstants =
+  //   new SwerveDrivetrainConstants()
+  //   .withCANBusName(kCANBus.getName())
+  //   .withPigeon2Id(kPigeonId)
+  //   .withPigeon2Configs(pigeonConfigs);
 
   private static final SwerveModuleConstantsFactory<
           TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration>
