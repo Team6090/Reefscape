@@ -124,7 +124,6 @@ public class RobotContainer {
     autoChooser.addOption("6Meter", new PathPlannerAuto("6Meter"));
     autoChooser.addOption("9Meter", new PathPlannerAuto("9Meter"));
     autoChooser.addOption("3Meter_Left2Meter", new PathPlannerAuto("3Meter_Left2Meter"));
-    autoChooser.addOption("Maybe?", new PathPlannerAuto("PoseSet"));
 
     // Configure the button bindings
     configureButtonBindings();
