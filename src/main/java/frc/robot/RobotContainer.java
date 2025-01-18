@@ -17,14 +17,13 @@ import static frc.robot.subsystems.vision.VisionConstants.camera0Name;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -36,8 +35,8 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOLimelight;
+import java.lang.reflect.Array;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -85,7 +84,7 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.FrontRight),
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement);
 
         break;
 
@@ -98,7 +97,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        vision = new Vision(drive::addVisionMeasurement);
 
         break;
     }
@@ -125,6 +124,7 @@ public class RobotContainer {
     autoChooser.addOption("6Meter", new PathPlannerAuto("6Meter"));
     autoChooser.addOption("9Meter", new PathPlannerAuto("9Meter"));
     autoChooser.addOption("3Meter_Left2Meter", new PathPlannerAuto("3Meter_Left2Meter"));
+    autoChooser.addOption("Maybe?", new PathPlannerAuto("PoseSet"));
 
     // Configure the button bindings
     configureButtonBindings();
@@ -169,18 +169,41 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    @SuppressWarnings("resource")
-    PIDController aimController = new PIDController(0.2, 0.0, 0.0);
-    aimController.enableContinuousInput(-Math.PI, Math.PI);
-    controller.y().onTrue(Commands.runOnce(() -> aimController.reset(), new Subsystem[0]));
+    // @SuppressWarnings("resource")
+    // PIDController aimController = new PIDController(0.2, 0.0, 0.0);
+    // aimController.enableContinuousInput(-Math.PI, Math.PI);
+    // controller.y().onTrue(Commands.runOnce(() -> aimController.reset(), new Subsystem[0]));
+    // controller
+    //     .y()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> controller.getLeftX(),
+    //             () -> controller.getLeftY(),
+    //             () -> new
+    // Rotation2d(aimController.calculate(vision.getTargetX(0).getRadians()))));
+
     controller
         .y()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> controller.getLeftX(),
-                () -> controller.getLeftY(),
-                () -> new Rotation2d(aimController.calculate(vision.getTargetX(0).getRadians()))));
+        .onTrue(
+            Commands.runOnce(
+                () ->
+                    drive.setPose(
+                        new Pose2d(
+                            Array.getDouble(
+                                NetworkTableInstance.getDefault()
+                                    .getTable(camera0Name)
+                                    .getEntry("botpose_orb_wpiblue")
+                                    .getDoubleArray(new double[18]),
+                                0),
+                            Array.getDouble(
+                                NetworkTableInstance.getDefault()
+                                    .getTable(camera0Name)
+                                    .getEntry("botpose_orb_wpiblue")
+                                    .getDoubleArray(new double[18]),
+                                1),
+                            drive.getRotation())),
+                drive));
   }
 
   /**

@@ -132,7 +132,6 @@ public class Drive extends SubsystemBase {
         this::runVelocity,
         new PPHolonomicDriveController(
             new PIDConstants(25, 0.0, 0.65), new PIDConstants(10.0, 0.0, 0.1)),
-        // driveP 1.25, driveD 0.175
         PP_CONFIG,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -161,6 +160,30 @@ public class Drive extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // poseEstimator.addVisionMeasurement(
+    //     new Pose2d(
+    //         Array.getDouble(
+    //             NetworkTableInstance.getDefault()
+    //                 .getTable(VisionConstants.camera0Name)
+    //                 .getEntry("botpose_orb_wpiblue")
+    //                 .getDoubleArray(new double[18]),
+    //             0),
+    //         Array.getDouble(
+    //             NetworkTableInstance.getDefault()
+    //                 .getTable(VisionConstants.camera0Name)
+    //                 .getEntry("botpose_orb_wpiblue")
+    //                 .getDoubleArray(new double[18]),
+    //             1),
+    //         new Rotation2d(
+    //             Array.getDouble(
+    //                 NetworkTableInstance.getDefault()
+    //                     .getTable(VisionConstants.camera0Name)
+    //                     .getEntry("botpose_orb_wpiblue")
+    //                     .getDoubleArray(new double[18]),
+    //                 5))),
+    //     (double) RobotController.getFPGATime() / 100000);
+
     odometryLock.lock(); // Prevents odometry updates while reading data
     gyroIO.updateInputs(gyroInputs);
     Logger.processInputs("Drive/Gyro", gyroInputs);
